@@ -5,6 +5,7 @@ Quick example of instantiating a gRPC Go service in a custom container at runtim
 ## Prerequisites
 
 * Docker is installed and running
+* Create an `internal/generated` directory
 
 ## Instructions
 
