@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"os"
 	"time"
 
 	"github.com/RGood/compute-go-vm/internal/generated/protos/echo"
@@ -15,6 +16,7 @@ import (
 
 func createMachine(c *cluster.Cluster, id string, backend string) *cluster.Machine {
 	socketPath := fmt.Sprintf("/tmp/compute/%s", id)
+	os.MkdirAll(socketPath, os.ModeDir)
 
 	m := c.NewMachine(&config.Machine{
 		Name:       fmt.Sprintf("worker-%s", id),
