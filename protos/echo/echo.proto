@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package echo;
+
+option go_package = "github.com/RGood/compute-go-vm/internal/generated/echo";
+
+message Message {
+    string id = 1;
+    string message = 2;
+}
+
+service Echo {
+    rpc Ping(Message) returns(Message);
+}
