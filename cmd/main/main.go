@@ -17,12 +17,12 @@ import (
 
 func createMachine(c *cluster.Cluster, id string, backend string) *cluster.Machine {
 	socketPath := fmt.Sprintf("/tmp/compute/%s", id)
-	os.MkdirAll(socketPath, os.ModeDir)
+	os.MkdirAll(socketPath, 0777)
 
 	m := c.NewMachine(&config.Machine{
 		Name:       fmt.Sprintf("worker-%s", id),
-		Image:      "docker.io/library/compute:worker01",
-		Privileged: true,
+		Image:      "docker.io/library/compute:worker-go",
+		Privileged: false,
 		PublicKey:  "machine-key",
 		Backend:    backend,
 		Volumes: []config.Volume{
@@ -34,12 +34,13 @@ func createMachine(c *cluster.Cluster, id string, backend string) *cluster.Machi
 		},
 		Cmd: "/srv/server",
 	})
-	c.CreateMachine(m, 0)
+	err := c.CreateMachine(m, 0)
+	if err != nil {
+		panic(err)
+	}
 
 	return m
 }
-
-var socketDir string = "/tmp/compute"
 
 func dial(addr string, t time.Duration) (net.Conn, error) {
 	return net.Dial("unix", addr)
@@ -61,7 +62,7 @@ func main() {
 	s.Init()
 
 	// Store a dummy public key
-	err = s.Store("machine-key", "machine-key")
+	s.Store("machine-key", "machine-key")
 
 	// Set the container's key store to the one we made
 	c.SetKeyStore(s)

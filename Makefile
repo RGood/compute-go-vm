@@ -7,7 +7,7 @@ protos:
 
 .PHONY: build-worker
 build-worker: protos
-	docker build -t compute:worker01 -f Dockerfile.worker .
+	docker build -t compute:worker-go -f Dockerfile.worker .
 
 .PHONY: build-main
 build-main: protos
