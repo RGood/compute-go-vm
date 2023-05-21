@@ -75,10 +75,13 @@ func main() {
 	id := uuid.NewString()
 
 	// Create machine
+	mStart := time.Now()
 	m, err := createMachine(c, id, "docker")
 	if err != nil {
 		log.Fatalf("Error creating machine: %s\n", err.Error())
 	}
+	mDuration := time.Since(mStart)
+	fmt.Printf("Machine started in %s\n", mDuration)
 	defer c.DeleteMachine(m, 0)
 
 	// Connect to the gRPC socket created by the machine
