@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"net"
 	"os"
 	"sync"
@@ -15,9 +16,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-func createMachine(c *cluster.Cluster, id string, backend string) *cluster.Machine {
+func createMachine(c *cluster.Cluster, id string, backend string) (*cluster.Machine, error) {
 	socketPath := fmt.Sprintf("/tmp/compute/%s", id)
-	os.MkdirAll(socketPath, 0777)
+	err := os.MkdirAll(socketPath, 0777)
+	if err != nil {
+		return nil, err
+	}
 
 	m := c.NewMachine(&config.Machine{
 		Name:       fmt.Sprintf("worker-%s", id),
@@ -34,12 +38,12 @@ func createMachine(c *cluster.Cluster, id string, backend string) *cluster.Machi
 		},
 		Cmd: "/srv/server",
 	})
-	err := c.CreateMachine(m, 0)
+	err = c.CreateMachine(m, 0)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return m
+	return m, nil
 }
 
 func dial(addr string, t time.Duration) (net.Conn, error) {
@@ -71,7 +75,10 @@ func main() {
 	id := uuid.NewString()
 
 	// Create machine
-	m := createMachine(c, id, "docker")
+	m, err := createMachine(c, id, "docker")
+	if err != nil {
+		log.Fatalf("Error creating machine: %s\n", err.Error())
+	}
 	defer c.DeleteMachine(m, 0)
 
 	// Connect to the gRPC socket created by the machine

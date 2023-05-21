@@ -1,4 +1,4 @@
-FROM golang:1.20 as build
+FROM golang:alpine as build
 WORKDIR /src
 
 COPY cmd/ cmd
@@ -6,13 +6,14 @@ COPY internal/ internal
 COPY go.mod go.mod
 COPY go.sum go.sum
 
-RUN go build -o server cmd/main/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o server cmd/main/main.go
 
-FROM ubuntu:22.04 as production
+FROM alpine:3.18 as production
 WORKDIR /srv
 
-RUN apt-get update && apt-get install docker.io -y
+RUN apk update && apk add --no-cache docker-cli
+RUN apk add --no-cache bash
 
 COPY --from=build /src/server server
 
-CMD [ "./server" ]
+CMD [ "/srv/server" ]
