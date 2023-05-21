@@ -9,6 +9,16 @@ protos:
 build-worker: protos
 	docker build -t compute:worker01 -f Dockerfile.worker .
 
+.PHONY: build-main
+build-main: protos
+	docker build -t  compute:orchestration -f Dockerfile .
+
+.PHONY: build
+build: build-worker build-main
+
 .PHONY: run
 run:
-	sudo go run cmd/main/main.go
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/compute:/tmp/compute compute:orchestration
+
+ssh:
+	docker run -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/compute:/tmp/compute -it --entrypoint bash compute:orchestration

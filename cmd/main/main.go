@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/RGood/compute-go-vm/internal/generated/protos/echo"
@@ -83,21 +84,37 @@ func main() {
 	echoClient := echo.NewEchoClient(conn)
 
 	// Call the echo client N times and verify it succeeded
-	for i := 0; i < 10; i++ {
-		res, err := echoClient.Ping(context.Background(), &echo.Message{
+	start := time.Now()
+	for i := 0; i < 1000; i++ {
+		_, err := echoClient.Ping(context.Background(), &echo.Message{
 			Message: fmt.Sprintf("foo: %d", i),
 		})
 		if err != nil {
 			println(err.Error())
 			return
 		}
-		println(res.Message)
 	}
+	d := time.Since(start)
 
-	// Create vm config from template
-	// Instantiate vm
+	fmt.Printf("Sync: %d requests made in: %s\n", 1000, d)
 
-	// // Message it N times via the socket
-
-	// Teardown
+	wg := sync.WaitGroup{}
+	start = time.Now()
+	// Message it N times via the socket
+	for i := 0; i < 1000; i++ {
+		wg.Add(1)
+		go func(i int) {
+			_, err := echoClient.Ping(context.Background(), &echo.Message{
+				Message: fmt.Sprintf("foo: %d", i),
+			})
+			if err != nil {
+				println(err.Error())
+				return
+			}
+			wg.Done()
+		}(i)
+	}
+	wg.Wait()
+	d = time.Since(start)
+	fmt.Printf("Async: %d requests made in: %s\n", 1000, d)
 }
