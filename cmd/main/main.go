@@ -115,7 +115,7 @@ func main() {
 
 	wg := sync.WaitGroup{}
 	start = time.Now()
-	total := atomic.Int32{}
+	total := atomic.Uint64{}
 	// Message it N times via the socket
 	for i := 0; i < requests; i++ {
 		wg.Add(1)
@@ -128,12 +128,12 @@ func main() {
 				println(err.Error())
 				return
 			}
-			total.Add(int32(time.Since(s)))
+			total.Add(uint64(time.Since(s)))
 			wg.Done()
 		}(i)
 	}
 	wg.Wait()
 	d = time.Since(start)
 	fmt.Printf("Async: %d requests made in: %s\n", requests, d)
-	fmt.Printf("Avg. Req. Duration: %s\n", time.Duration(total.Load()/int32(requests)))
+	fmt.Printf("Avg. Req. Duration: %s\n", time.Duration(total.Load()/uint64(requests)))
 }
