@@ -17,7 +17,6 @@ type EchoServer struct {
 }
 
 func (es *EchoServer) Ping(ctx context.Context, msg *echo.Message) (*echo.Message, error) {
-	msg.Message = "pong: " + msg.Message
 	return msg, nil
 }
 
