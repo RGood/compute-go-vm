@@ -1,5 +1,7 @@
-const grpc = require('@grpc/grpc-js');
-var protoLoader = require('@grpc/proto-loader');
+import grpc from '@grpc/grpc-js';
+import protoLoader from '@grpc/proto-loader';
+import * as url from 'url';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 var PROTO_PATH = __dirname + '/../../protos/echo/echo.proto';
 var packageDefinition = protoLoader.loadSync(
   PROTO_PATH,
@@ -21,7 +23,7 @@ const EchoService = {
 }
 
 var server = new grpc.Server();
-server.addService(echo.Echo.service, EchoService);
+server.addService(echo["Echo"].service, EchoService);
 
 server.bindAsync('unix:///tmp/comms/socket.sock', grpc.ServerCredentials.createInsecure(), (err, port) => {
   if(!!err) {

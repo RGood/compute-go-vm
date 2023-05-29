@@ -13,5 +13,6 @@ RUN apk add --no-cache bash
 
 COPY --from=build /build/node_modules /srv/node_modules
 COPY --from=build /build/dist /srv/dist
+COPY --from=build /build/package.json /srv/package.json
 COPY protos /protos
 COPY js_worker/server /srv

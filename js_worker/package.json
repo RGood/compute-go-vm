@@ -2,6 +2,7 @@
   "name": "js_worker",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "license": "MIT",
   "scripts": {
     "build": "esbuild src/index.ts --outdir=dist",
