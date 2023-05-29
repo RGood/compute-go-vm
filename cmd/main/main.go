@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/RGood/compute-go-vm/internal/generated/protos/echo"
@@ -94,9 +95,11 @@ func main() {
 	// Instantiate an echo client using that connection
 	echoClient := echo.NewEchoClient(conn)
 
+	requests := 1000
+
 	// Call the echo client N times and verify it succeeded
 	start := time.Now()
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < requests; i++ {
 		_, err := echoClient.Ping(context.Background(), &echo.Message{
 			Message: fmt.Sprintf("foo: %d", i),
 		})
@@ -107,14 +110,17 @@ func main() {
 	}
 	d := time.Since(start)
 
-	fmt.Printf("Sync: %d requests made in: %s\n", 1000, d)
+	fmt.Printf("Sync: %d requests made in: %s\n", requests, d)
+	fmt.Printf("Avg. Req. Duration: %s\n", d/time.Duration(requests))
 
 	wg := sync.WaitGroup{}
 	start = time.Now()
+	total := atomic.Int32{}
 	// Message it N times via the socket
 	for i := 0; i < 1000; i++ {
 		wg.Add(1)
 		go func(i int) {
+			s := time.Now()
 			_, err := echoClient.Ping(context.Background(), &echo.Message{
 				Message: fmt.Sprintf("foo: %d", i),
 			})
@@ -122,10 +128,12 @@ func main() {
 				println(err.Error())
 				return
 			}
+			total.Add(int32(time.Since(s)))
 			wg.Done()
 		}(i)
 	}
 	wg.Wait()
 	d = time.Since(start)
-	fmt.Printf("Async: %d requests made in: %s\n", 1000, d)
+	fmt.Printf("Async: %d requests made in: %s\n", requests, d)
+	fmt.Printf("Avg. Req. Duration: %s\n", time.Duration(total.Load()/int32(requests)))
 }
