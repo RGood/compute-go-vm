@@ -2,3 +2,4 @@ vendor/
 internal/generated/
 js_worker/node_modules/
 js_worker/dist/
+js_worker/yarn.lock
