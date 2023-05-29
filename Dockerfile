@@ -1,5 +1,5 @@
 FROM golang:alpine as build
-WORKDIR /src
+WORKDIR /build
 
 COPY cmd/ cmd
 COPY internal/ internal
@@ -14,6 +14,6 @@ WORKDIR /srv
 RUN apk update && apk add --no-cache docker-cli
 RUN apk add --no-cache bash
 
-COPY --from=build /src/server server
+COPY --from=build /build/server server
 
 CMD [ "/srv/server" ]
