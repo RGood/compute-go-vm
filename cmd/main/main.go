@@ -25,7 +25,7 @@ func createMachine(c *cluster.Cluster, id string, backend string) (*cluster.Mach
 
 	m := c.NewMachine(&config.Machine{
 		Name:       fmt.Sprintf("worker-%s", id),
-		Image:      "docker.io/library/compute:worker-go",
+		Image:      "docker.io/library/compute:worker-js",
 		Privileged: false,
 		PublicKey:  "machine-key",
 		Backend:    backend,
@@ -85,7 +85,7 @@ func main() {
 	defer c.DeleteMachine(m, 0)
 
 	// Connect to the gRPC socket created by the machine
-	conn, err := grpc.Dial(fmt.Sprintf("/tmp/compute/%s/socket.sock", id), grpc.WithInsecure(), grpc.WithDialer(dial))
+	conn, err := grpc.Dial(fmt.Sprintf("/tmp/compute/%s/socket.sock", id), grpc.WithInsecure(), grpc.WithAuthority("localhost"), grpc.WithDialer(dial))
 	if err != nil {
 		println(err.Error())
 		return

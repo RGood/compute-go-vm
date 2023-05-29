@@ -1,0 +1,19 @@
+{
+  "name": "js_worker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "esbuild src/index.ts --outdir=dist",
+    "clean": "rm -rf ./dist"
+  },
+  "devDependencies": {
+    "typescript": "^4.2.3"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.8.14",
+    "@grpc/proto-loader": "^0.7.7",
+    "esbuild": "^0.17.19",
+    "esm": "^3.2.25"
+  }
+}
