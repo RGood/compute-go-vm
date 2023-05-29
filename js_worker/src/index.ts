@@ -1,6 +1,5 @@
 const grpc = require('@grpc/grpc-js');
 var protoLoader = require('@grpc/proto-loader');
-const net = require('net');
 var PROTO_PATH = __dirname + '/../../protos/echo/echo.proto';
 var packageDefinition = protoLoader.loadSync(
   PROTO_PATH,
@@ -20,7 +19,6 @@ const EchoService = {
     callback(null, call.request);
   }
 }
-var echoDefinition = protoDescriptor.echo;
 
 var server = new grpc.Server();
 server.addService(echo.Echo.service, EchoService);

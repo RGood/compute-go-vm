@@ -1,6 +1,5 @@
 const grpc = require("@grpc/grpc-js");
 var protoLoader = require("@grpc/proto-loader");
-const net = require("net");
 var PROTO_PATH = __dirname + "/../../protos/echo/echo.proto";
 var packageDefinition = protoLoader.loadSync(
   PROTO_PATH,
@@ -12,40 +11,21 @@ var packageDefinition = protoLoader.loadSync(
     oneofs: true
   }
 );
+var protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
+var echo = protoDescriptor.echo;
 const EchoService = {
   ping: (call, callback) => {
-    const request = call.request;
-    console.log(request);
-    const response = new packageDefinition.Echo.Message();
-    response.setMessage(`Hello, ${request.getName()}!`);
-    callback(null, response);
+    console.log(call.request);
+    callback(null, call.request);
   }
 };
-function serverProto(socket) {
-  return {
-    getPeer: () => {
-      return socket.remoteAddress;
-    },
-    write: (data) => {
-      socket.write(data);
-    },
-    end: () => {
-      socket.end();
-    },
-    on: (event, callback) => {
-      socket.on(event, callback);
-    }
-  };
-}
-var protoDescriptor = grpc.loadPackageDefinition(packageDefinition);
-var echoDefinition = protoDescriptor.echo;
-console.log(JSON.stringify(echoDefinition));
 var server = new grpc.Server();
-const unixServer = net.createServer((socket) => {
-  server.addProtoService(packageDefinition.Echo.echo, EchoService);
-  server.handle(serverProto(socket));
-});
-const unixSocketPath = "/tmp/comms/socket.sock";
-unixServer.listen(unixSocketPath, () => {
-  console.log(`gRPC server is running on Unix socket: ${unixSocketPath}`);
+server.addService(echo.Echo.service, EchoService);
+server.bindAsync("unix:///tmp/comms/socket.sock", grpc.ServerCredentials.createInsecure(), (err, port) => {
+  if (!!err) {
+    console.log(err);
+    return;
+  }
+  console.log(`Listening on: ${port}`);
+  server.start();
 });
