@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "tsc --build . && esbuild tsc/index.js --bundle --platform=node --format=cjs --outdir=dist",
+    "build": "tsc --build . && esbuild tsc/index.js --bundle --minify --platform=node --format=cjs --outdir=dist",
     "clean": "rm -rf ./dist"
   },
   "devDependencies": {
