@@ -117,7 +117,7 @@ func main() {
 	start = time.Now()
 	total := atomic.Int32{}
 	// Message it N times via the socket
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < requests; i++ {
 		wg.Add(1)
 		go func(i int) {
 			s := time.Now()
