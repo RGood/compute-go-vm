@@ -122,6 +122,7 @@ func main() {
 		go func(i int) {
 			s := time.Now()
 			_, err := echoClient.Ping(context.Background(), &echo.Message{
+				Id:      uuid.NewString(),
 				Message: fmt.Sprintf("foo: %d", i),
 			})
 			if err != nil {

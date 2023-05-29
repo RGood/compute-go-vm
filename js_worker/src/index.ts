@@ -17,7 +17,6 @@ var echo = protoDescriptor.echo;
 
 const EchoService = {
   ping: (call, callback) => {
-    console.log(call.request);
     callback(null, call.request);
   }
 }
