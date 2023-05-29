@@ -1,4 +1,4 @@
-FROM node:12.18.1 as build
+FROM node:latest as build
 WORKDIR /build
 COPY js_worker/package.json /build
 COPY js_worker/yarn.lock /build
