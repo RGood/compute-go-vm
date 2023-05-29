@@ -25,12 +25,14 @@ var protoDescriptor = loadPackageDefinition(packageDefinition);
 // Echo service description
 var echo = protoDescriptor.echo;
 
+// ==========================USER CODE GOES HERE==================================
 // Loose Echo service impl
 const EchoService: UntypedServiceImplementation = {
   ping: (call: ServerUnaryCall<any, any>, callback: sendUnaryData<any>): void => {
     callback(null, call.request);
   }
 }
+// ===============================================================================
 
 // Define grpc server and register the Echo service
 var server = new Server();
